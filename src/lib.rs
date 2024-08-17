@@ -3,7 +3,7 @@ use error::PlistError;
 #[doc = include_str!("../README.md")]
 use log::{trace, warn};
 use rand::Rng;
-use std::{ffi::CString, fmt::Formatter, os::raw::c_char};
+use std::{ffi::CString, fmt::Formatter, os::raw::c_char, ptr::null_mut};
 
 pub mod error;
 mod iterator;
@@ -60,6 +60,18 @@ impl Plist {
             unsafe_bindings::plist_from_xml(xml.as_ptr() as *const c_char, xml_len, &mut plist_t)
         };
         Ok(plist_t.into())
+    }
+
+    pub fn plist_to_xml(&self) -> Result<String, PlistError> {
+        let mut to_return: *mut i8 = null_mut();
+        let mut thing: std::ffi::c_uint = 0;
+        let something: String;
+        unsafe {
+            unsafe_bindings::plist_to_xml(self.plist_t, &mut to_return, &mut thing);
+            something = CString::from_raw(to_return).into_string().map_err(|_| PlistError::InvalidArg)?;
+        };
+
+        Ok(something)
     }
     /// This takes a string in the form of binary and returns a Plist struct
     pub fn from_bin(bin: Vec<u8>) -> Result<Plist, PlistError> {
