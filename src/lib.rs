@@ -44,6 +44,15 @@ impl Plist {
     pub fn get_pointer(&self) -> *mut std::ffi::c_void {
         self.plist_t as *mut std::ffi::c_void
     }
+
+    pub fn from_pointer(pointer: *mut std::ffi::c_void) -> Plist {
+        Plist {
+            plist_t: pointer as unsafe_bindings::plist_t,
+            plist_type: unsafe { unsafe_bindings::plist_get_node_type(pointer as *mut c_char) }.into(),
+            id: 0,
+        }
+    }
+
     /// This takes a string in the form of XML and returns a Plist struct
     pub fn from_xml(xml: String) -> Result<Plist, PlistError> {
         let xml = match CString::new(xml) {
