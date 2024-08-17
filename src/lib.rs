@@ -48,7 +48,7 @@ impl Plist {
     pub fn from_pointer(pointer: *mut std::ffi::c_void) -> Plist {
         Plist {
             plist_t: pointer as unsafe_bindings::plist_t,
-            plist_type: unsafe { unsafe_bindings::plist_get_node_type(pointer as *mut c_char) }.into(),
+            plist_type: unsafe { unsafe_bindings::plist_get_node_type(pointer as *mut core::ffi::c_void) }.into(),
             id: 0,
         }
     }
